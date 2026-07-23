@@ -2,7 +2,11 @@
 sidebar-menu = Menü
 sidebar-home = Startseite
 sidebar-passkeys = Schlüssel
+sidebar-oath = OATH
+sidebar-otp = OTP
 sidebar-config = Konfiguration
+sidebar-vendor = Vendor-Befehle
+sidebar-firmware = Firmware
 sidebar-security = Sicherheit
 sidebar-about = Über
 sidebar-device-status = Gerätestatus
@@ -37,10 +41,7 @@ passkeys-no = Nein
 passkeys-cancel = Abbrechen
 passkeys-rp-id = RP ID
 passkeys-user-name = Benutzername
-passkeys-credentials-count = { $count -> 
-    [one] { $count } Anmeldeinformation
-    *[other] { $count } Anmeldeinformationen
-}
+passkeys-credentials-count = {count} Anmeldeinformationen
 
 # Konfigurationsbildschirm
 config-title = Konfiguration
@@ -115,3 +116,65 @@ status-connected = Verbunden
 status-disconnected = Getrennt
 status-syncing = Synchronisieren...
 status-sync-complete = Synchronisierung abgeschlossen
+
+# OATH-Bildschirm
+oath-title = OATH-Authenticator
+oath-subtitle = Verwalten Sie TOTP/HOTP-Anmeldeinformationen für die Zwei-Faktor-Authentifizierung.
+oath-no-credentials = Keine OATH-Anmeldeinformationen
+oath-no-credentials-desc = Fügen Sie TOTP- oder HOTP-Anmeldeinformationen hinzu, um Zwei-Faktor-Authentifizierungscodes zu generieren.
+oath-add = Anmeldeinformation hinzufügen
+oath-account-name = Kontoname
+oath-secret-key = Geheimer Schlüssel (Base32)
+oath-totp = TOTP
+oath-hotp = HOTP
+oath-digits = { $count } Ziffern
+oath-credentials-stored = {count} Anmeldeinformationen
+oath-import-qr = QR-Code importieren
+oath-import-qr-paste = otpauth:// URI aus Google Authenticator QR-Code einfügen
+
+# OTP-Bildschirm
+otp-title = OTP-Authenticator
+otp-subtitle = Verwalten Sie TOTP/HOTP-Anmeldeinformationen für Einmalpasswort-Authentifizierung.
+otp-no-credentials = Keine OTP-Anmeldeinformationen
+otp-no-credentials-desc = Fügen Sie TOTP- oder HOTP-Anmeldeinformationen für die Einmalpasswort-Authentifizierung hinzu.
+otp-add = Anmeldeinformation hinzufügen
+
+# Vendor-Bildschirm
+vendor-title = Vendor-Befehle
+vendor-subtitle = Erweiterte Vendor-spezifische Operationen und Geräteprotokolle.
+vendor-operations = Vendor-Operationen
+vendor-export-oath = OATH-Anmeldeinformationen exportieren
+vendor-export-otp = OTP-Anmeldeinformationen exportieren
+vendor-backup = Gerät sichern
+vendor-restore = Sicherung wiederherstellen
+vendor-logs = Geräteprotokolle
+vendor-logs-clear = Löschen
+vendor-logs-entries = {count} Einträge
+
+# Firmware-Bildschirm
+firmware-title = Firmware-Update
+firmware-subtitle = Prüfen und flashen Sie Firmware-Updates von GitHub.
+firmware-information = Firmware-Informationen
+firmware-current-version = Aktuelle Version
+firmware-latest-version = Neueste Version
+firmware-check-updates = Nach Updates suchen
+firmware-flash = Firmware flashen
+firmware-flash-progress = Flash-Fortschritt
+firmware-checking = GitHub auf Updates prüfen...
+firmware-update-available = Neue Version verfügbar: { $version }
+firmware-check-failed = Prüfung fehlgeschlagen: { $error }
+firmware-flashing = Firmware wird geflasht...
+firmware-flash-success = Firmware erfolgreich geflasht!
+firmware-no-version = Unbekannt
+firmware-not-checked = Nicht geprüft
+
+# Sicherheitsbildschirm (zusätzlich)
+security-lock-settings = Sperr-Einstellungen
+security-enable-secure-boot = Secure Boot aktivieren
+security-verify-firmware = Überprüft die Firmware-Signatur beim Start
+security-secure-lock = Sichere Sperre
+security-prevent-debug = Verhindert das Lesen von Schlüsselmaterial über Debug-Ports
+security-understand-risks = Ich verstehe die Risiken einer Beschädigung meines Geräts.
+security-permanently-lock = Gerät dauerhaft sperren
+security-enabling = Secure Boot wird aktiviert...
+security-disabling = Secure Boot wird deaktiviert...

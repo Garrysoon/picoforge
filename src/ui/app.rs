@@ -9,8 +9,10 @@
 use crate::ui::components::sidebar::{AppSidebar, SidebarEvent};
 use crate::ui::models::device::{DeviceEvent, DeviceRepo};
 use crate::ui::screens::{
-    about::AboutViewModel, config::ConfigViewModel, home::HomeViewModel, passkeys::PasskeysEvent,
-    passkeys::PasskeysViewModel, security::SecurityViewModel,
+    about::AboutViewModel, config::ConfigViewModel, firmware::FirmwareViewModel,
+    home::HomeViewModel, oath::OathViewModel, otp::OtpViewModel,
+    passkeys::PasskeysEvent, passkeys::PasskeysViewModel,
+    security::SecurityViewModel, vendor::VendorViewModel,
 };
 use gpui::prelude::*;
 use gpui::*;
@@ -33,6 +35,10 @@ pub struct ViewModelStore {
     pub about: Option<Entity<AboutViewModel>>,
     pub security: Option<Entity<SecurityViewModel>>,
     pub passkeys: Option<Entity<PasskeysViewModel>>,
+    pub oath: Option<Entity<OathViewModel>>,
+    pub otp: Option<Entity<OtpViewModel>>,
+    pub vendor: Option<Entity<VendorViewModel>>,
+    pub firmware: Option<Entity<FirmwareViewModel>>,
     pub config: Option<Entity<ConfigViewModel>>,
 }
 
@@ -44,6 +50,10 @@ impl ViewModelStore {
             about: None,
             security: None,
             passkeys: None,
+            oath: None,
+            otp: None,
+            vendor: None,
+            firmware: None,
             config: None,
         }
     }
@@ -54,7 +64,11 @@ impl ViewModelStore {
 pub enum Destination {
     Home,
     Passkeys,
+    Oath,
+    Otp,
     Configuration,
+    Vendor,
+    Firmware,
     Security,
     About,
 }
@@ -191,9 +205,33 @@ impl Render for ApplicationRoot {
                     });
                     view.clone().into_any_element()
                 }
+                Destination::Oath => {
+                    let view = self.views_store.oath.get_or_insert_with(|| {
+                        cx.new(|cx| OathViewModel::new(window, cx, &self.models))
+                    });
+                    view.clone().into_any_element()
+                }
+                Destination::Otp => {
+                    let view = self.views_store.otp.get_or_insert_with(|| {
+                        cx.new(|cx| OtpViewModel::new(window, cx, &self.models))
+                    });
+                    view.clone().into_any_element()
+                }
                 Destination::Configuration => {
                     let view = self.views_store.config.get_or_insert_with(|| {
                         cx.new(|cx| ConfigViewModel::new(window, cx, &self.models))
+                    });
+                    view.clone().into_any_element()
+                }
+                Destination::Vendor => {
+                    let view = self.views_store.vendor.get_or_insert_with(|| {
+                        cx.new(|cx| VendorViewModel::new(window, cx, &self.models))
+                    });
+                    view.clone().into_any_element()
+                }
+                Destination::Firmware => {
+                    let view = self.views_store.firmware.get_or_insert_with(|| {
+                        cx.new(|cx| FirmwareViewModel::new(window, cx, &self.models))
                     });
                     view.clone().into_any_element()
                 }

@@ -2,7 +2,11 @@
 sidebar-menu = Menu
 sidebar-home = Accueil
 sidebar-passkeys = Clés
+sidebar-oath = OATH
+sidebar-otp = OTP
 sidebar-config = Configuration
+sidebar-vendor = Commandes Vendor
+sidebar-firmware = Micrologiciel
 sidebar-security = Sécurité
 sidebar-about = À propos
 sidebar-device-status = État de l'appareil
@@ -37,10 +41,7 @@ passkeys-no = Non
 passkeys-cancel = Annuler
 passkeys-rp-id = RP ID
 passkeys-user-name = Nom d'utilisateur
-passkeys-credentials-count = { $count -> 
-    [one] { $count } identifiant
-    *[other] { $count } identifiants
-}
+passkeys-credentials-count = {count} identifiants
 
 # Écran de configuration
 config-title = Configuration
@@ -115,3 +116,65 @@ status-connected = Connecté
 status-disconnected = Déconnecté
 status-syncing = Synchronisation...
 status-sync-complete = Synchronisation terminée
+
+# Écran OATH
+oath-title = Authentificateur OATH
+oath-subtitle = Gérez les identifiants TOTP/HOTP pour l'authentification à deux facteurs.
+oath-no-credentials = Aucun identifiant OATH
+oath-no-credentials-desc = Ajoutez des identifiants TOTP ou HOTP pour générer des codes d'authentification à deux facteurs.
+oath-add = Ajouter un identifiant
+oath-account-name = Nom du compte
+oath-secret-key = Clé secrète (Base32)
+oath-totp = TOTP
+oath-hotp = HOTP
+oath-digits = { $count } chiffres
+oath-credentials-stored = {count} identifiants
+oath-import-qr = Importer un QR Code
+oath-import-qr-paste = Collez l'URI otpauth:// du QR Code Google Authenticator
+
+# Écran OTP
+otp-title = Authentificateur OTP
+otp-subtitle = Gérez les identifiants TOTP/HOTP pour l'authentification par mot de passe à usage unique.
+otp-no-credentials = Aucun identifiant OTP
+otp-no-credentials-desc = Ajoutez des identifiants TOTP ou HOTP pour l'authentification par mot de passe à usage unique.
+otp-add = Ajouter un identifiant
+
+# Écran Vendor
+vendor-title = Commandes Vendor
+vendor-subtitle = Opérations Vendor avancées et journal de l'appareil.
+vendor-operations = Opérations Vendor
+vendor-export-oath = Exporter les identifiants OATH
+vendor-export-otp = Exporter les identifiants OTP
+vendor-backup = Sauvegarder l'appareil
+vendor-restore = Restaurer la sauvegarde
+vendor-logs = Journal de l'appareil
+vendor-logs-clear = Effacer
+vendor-logs-entries = {count} entrées
+
+# Écran firmware
+firmware-title = Mise à jour du firmware
+firmware-subtitle = Vérifiez et flash les mises à jour du firmware depuis GitHub.
+firmware-information = Informations sur le firmware
+firmware-current-version = Version actuelle
+firmware-latest-version = Dernière version
+firmware-check-updates = Vérifier les mises à jour
+firmware-flash = Flasher le firmware
+firmware-flash-progress = Progression du flash
+firmware-checking = Vérification de GitHub pour les mises à jour...
+firmware-update-available = Nouvelle version disponible : { $version }
+firmware-check-failed = Échec de la vérification : { $error }
+firmware-flashing = Flash du firmware en cours...
+firmware-flash-success = Firmware flashé avec succès !
+firmware-no-version = Inconnu
+firmware-not-checked = Non vérifié
+
+# Écran de sécurité (supplémentaire)
+security-lock-settings = Paramètres de verrouillage
+security-enable-secure-boot = Activer le Secure Boot
+security-verify-firmware = Vérifie la signature du firmware au démarrage
+security-secure-lock = Verrouillage sécurisé
+security-prevent-debug = Empêche la lecture du matériel via les ports de débogage
+security-understand-risks = Je comprends les risques de bricolage de mon appareil.
+security-permanently-lock = Verrouiller définitivement l'appareil
+security-enabling = Activation du Secure Boot...
+security-disabling = Désactivation du Secure Boot...

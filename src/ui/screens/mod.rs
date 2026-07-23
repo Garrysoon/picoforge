@@ -1,5 +1,9 @@
 pub mod about;
 pub mod config;
+pub mod firmware;
 pub mod home;
+pub mod oath;
+pub mod otp;
 pub mod passkeys;
 pub mod security;
+pub mod vendor;

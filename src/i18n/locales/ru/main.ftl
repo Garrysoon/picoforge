@@ -2,7 +2,11 @@
 sidebar-menu = Меню
 sidebar-home = Главная
 sidebar-passkeys = Ключи
+sidebar-oath = OATH
+sidebar-otp = OTP
 sidebar-config = Конфигурация
+sidebar-vendor = Команды Vendor
+sidebar-firmware = Прошивка
 sidebar-security = Безопасность
 sidebar-about = О программе
 sidebar-device-status = Статус устройства
@@ -37,12 +41,7 @@ passkeys-no = Нет
 passkeys-cancel = Отмена
 passkeys-rp-id = RP ID
 passkeys-user-name = Имя пользователя
-passkeys-credentials-count = { $count -> 
-    [one] { $count } учетная запись
-    [few] { $count } учетные записи
-    [many] { $count } учетных записей
-    *[other] { $count } учетных записей
-}
+passkeys-credentials-count = {count} учетных записей
 
 # Экран конфигурации
 config-title = Конфигурация
@@ -116,3 +115,65 @@ status-connected = Подключено
 status-disconnected = Отключено
 status-syncing = Синхронизация...
 status-sync-complete = Синхронизация завершена
+
+# Экран OATH
+oath-title = OATH Аутентификатор
+oath-subtitle = Управление учетными записями TOTP/HOTP для двухфакторной аутентификации.
+oath-no-credentials = Нет учетных записей OATH
+oath-no-credentials-desc = Добавьте учетные записи TOTP или HOTP для генерации кодов двухфакторной аутентификации.
+oath-add = Добавить учетную запись
+oath-account-name = Имя учетной записи
+oath-secret-key = Секретный ключ (Base32)
+oath-totp = TOTP
+oath-hotp = HOTP
+oath-digits = { $count } цифр
+oath-credentials-stored = {count} учетных записей
+oath-import-qr = Импорт QR-кода
+oath-import-qr-paste = Вставьте otpauth:// URI из QR-кода Google Authenticator
+
+# Экран OTP
+otp-title = OTP Аутентификатор
+otp-subtitle = Управление учетными записями TOTP/HOTP для аутентификации одноразовыми паролями.
+otp-no-credentials = Нет учетных записей OTP
+otp-no-credentials-desc = Добавьте учетные записи TOTP или HOTP для аутентификации одноразовыми паролями.
+otp-add = Добавить учетную запись
+
+# Экран Vendor
+vendor-title = Команды Vendor
+vendor-subtitle = Расширенные операции Vendor и журнал устройства.
+vendor-operations = Операции Vendor
+vendor-export-oath = Экспорт учетных записей OATH
+vendor-export-otp = Экспорт учетных записей OTP
+vendor-backup = Резервное копирование устройства
+vendor-restore = Восстановление резервной копии
+vendor-logs = Журнал устройства
+vendor-logs-clear = Очистить
+vendor-logs-entries = {count} записей
+
+# Экран прошивки
+firmware-title = Обновление прошивки
+firmware-subtitle = Проверка и обновление прошивки с GitHub.
+firmware-information = Информация о прошивке
+firmware-current-version = Текущая версия
+firmware-latest-version = Последняя версия
+firmware-check-updates = Проверить обновления
+firmware-flash = Прошить прошивку
+firmware-flash-progress = Прогресс прошивки
+firmware-checking = Проверка GitHub на наличие обновлений...
+firmware-update-available = Доступна новая версия: { $version }
+firmware-check-failed = Ошибка проверки: { $error }
+firmware-flashing = Прошивка устройства...
+firmware-flash-success = Прошивка успешно завершена!
+firmware-no-version = Неизвестно
+firmware-not-checked = Не проверялось
+
+# Экран безопасности (дополнительно)
+security-lock-settings = Настройки блокировки
+security-enable-secure-boot = Включить безопасную загрузку
+security-verify-firmware = Проверяет подпись прошивки при запуске
+security-secure-lock = Безопасная блокировка
+security-prevent-debug = Предотвращает чтение ключей через отладочные порты
+security-understand-risks = Я понимаю риски повреждения устройства.
+security-permanently-lock = Постоянно заблокировать устройство
+security-enabling = Включение безопасной загрузки...
+security-disabling = Выключение безопасной загрузки...

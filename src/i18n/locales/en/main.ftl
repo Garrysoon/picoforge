@@ -2,7 +2,11 @@
 sidebar-menu = Menu
 sidebar-home = Home
 sidebar-passkeys = Passkeys
+sidebar-oath = OATH
+sidebar-otp = OTP
 sidebar-config = Configuration
+sidebar-vendor = Vendor Commands
+sidebar-firmware = Firmware
 sidebar-security = Security
 sidebar-about = About
 sidebar-device-status = Device Status
@@ -37,10 +41,7 @@ passkeys-no = No
 passkeys-cancel = Cancel
 passkeys-rp-id = RP ID
 passkeys-user-name = User Name
-passkeys-credentials-count = { $count -> 
-    [one] { $count } credential
-    *[other] { $count } credentials
-}
+passkeys-credentials-count = {count} credentials
 
 # Configuration screen
 config-title = Configuration
@@ -106,6 +107,68 @@ error-operation-failed = Operation failed
 error-invalid-pin = Invalid PIN
 error-pin-required = PIN is required
 error-device-locked = Device is locked
+
+# OATH screen
+oath-title = OATH Authenticator
+oath-subtitle = Manage TOTP/HOTP credentials for two-factor authentication.
+oath-no-credentials = No OATH Credentials
+oath-no-credentials-desc = Add TOTP or HOTP credentials to generate two-factor authentication codes.
+oath-add = Add Credential
+oath-account-name = Account Name
+oath-secret-key = Secret Key (Base32)
+oath-totp = TOTP
+oath-hotp = HOTP
+oath-digits = { $count } digits
+oath-credentials-stored = {count} credentials stored
+oath-import-qr = Import QR Code
+oath-import-qr-paste = Paste otpauth:// URI from Google Authenticator QR code
+
+# OTP screen
+otp-title = OTP Authenticator
+otp-subtitle = Manage TOTP/HOTP credentials for one-time password authentication.
+otp-no-credentials = No OTP Credentials
+otp-no-credentials-desc = Add TOTP or HOTP credentials for one-time password authentication.
+otp-add = Add Credential
+
+# Vendor screen
+vendor-title = Vendor Commands
+vendor-subtitle = Advanced vendor-specific operations and device logs.
+vendor-operations = Vendor Operations
+vendor-export-oath = Export OATH Credentials
+vendor-export-otp = Export OTP Credentials
+vendor-backup = Backup Device
+vendor-restore = Restore Backup
+vendor-logs = Device Logs
+vendor-logs-clear = Clear
+vendor-logs-entries = {count} entries
+
+# Firmware screen
+firmware-title = Firmware Update
+firmware-subtitle = Check for and flash firmware updates from GitHub.
+firmware-information = Firmware Information
+firmware-current-version = Current Version
+firmware-latest-version = Latest Version
+firmware-check-updates = Check for Updates
+firmware-flash = Flash Firmware
+firmware-flash-progress = Flash Progress
+firmware-checking = Checking GitHub for updates...
+firmware-update-available = New version available: { $version }
+firmware-check-failed = Check failed: { $error }
+firmware-flashing = Flashing firmware...
+firmware-flash-success = Firmware flashed successfully!
+firmware-no-version = Unknown
+firmware-not-checked = Not checked
+
+# Security screen (additional)
+security-lock-settings = Lock Settings
+security-enable-secure-boot = Enable Secure Boot
+security-verify-firmware = Verifies firmware signature on startup
+security-secure-lock = Secure Lock
+security-prevent-debug = Prevents reading key material via debug ports
+security-understand-risks = I understand the risks of bricking my device.
+security-permanently-lock = Permanently Lock Device
+security-enabling = Enabling secure boot...
+security-disabling = Disabling secure boot...
 
 # Status messages
 status-ready = Ready

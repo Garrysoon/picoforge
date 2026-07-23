@@ -190,9 +190,33 @@ impl Render for AppSidebar {
                         ))
                         .child(self.menu_item(
                             cx,
+                            t!("sidebar-oath").leak(),
+                            "icons/shield.svg",
+                            Destination::Oath,
+                        ))
+                        .child(self.menu_item(
+                            cx,
+                            t!("sidebar-otp").leak(),
+                            "icons/lock.svg",
+                            Destination::Otp,
+                        ))
+                        .child(self.menu_item(
+                            cx,
                             t!("sidebar-config").leak(),
                             "icons/settings.svg",
                             Destination::Configuration,
+                        ))
+                        .child(self.menu_item(
+                            cx,
+                            t!("sidebar-vendor").leak(),
+                            "icons/terminal.svg",
+                            Destination::Vendor,
+                        ))
+                        .child(self.menu_item(
+                            cx,
+                            t!("sidebar-firmware").leak(),
+                            "icons/download.svg",
+                            Destination::Firmware,
                         ))
                         .child(self.menu_item(
                             cx,
