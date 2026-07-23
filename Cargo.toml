@@ -49,6 +49,7 @@ rust-embed = "8.11.0"
 
 # For i18n:
 sys-locale = "0.3"
+nokhwa = { version = "0.10.11", features = ["input-native"] }
 
 [profile.dev]
 incremental = true  # Compile your binary in smaller steps.
