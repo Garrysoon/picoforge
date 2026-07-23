@@ -4,6 +4,7 @@ use crate::ui::models::device::{
     USB_CAP_OTP, USB_CAP_PIV, USB_CAP_U2F,
 };
 use crate::ui::screens::config::view_model::ConfigViewModel;
+use crate::t;
 use gpui::*;
 use gpui_component::{button::*, input::*, select::*, slider::*, switch::*, *};
 
@@ -529,8 +530,8 @@ impl Render for ConfigViewModel {
         if !has_device {
             let theme = cx.theme();
             return PageView::build(
-                "Configuration",
-                "Customize device settings and behavior.",
+                t!("config-title"),
+                t!("config-subtitle"),
                 div()
                     .flex()
                     .items_center()
@@ -542,7 +543,7 @@ impl Render for ConfigViewModel {
                     .child(
                         div()
                             .text_color(theme.muted_foreground)
-                            .child("No Device Connected"),
+                            .child(t!("common-no-device")),
                     ),
                 theme,
             )
@@ -616,8 +617,8 @@ impl Render for ConfigViewModel {
 
         let theme = cx.theme();
         PageView::build(
-            "Configuration",
-            "Customize device settings and behavior.",
+            t!("config-title"),
+            t!("config-subtitle"),
             inner,
             theme,
         )

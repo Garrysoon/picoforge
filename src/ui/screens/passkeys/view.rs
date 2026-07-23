@@ -6,6 +6,7 @@ use crate::ui::components::{
 };
 use crate::ui::models::device::{DeviceMethod, StoredCredential};
 use crate::ui::screens::passkeys::view_model::{PasskeysEvent, PasskeysViewModel};
+use crate::t;
 use directories::UserDirs;
 use gpui::prelude::FluentBuilder;
 use gpui::*;
@@ -299,7 +300,7 @@ impl PasskeysViewModel {
             .child(
                 div()
                     .text_color(theme.muted_foreground)
-                    .child("Connect your pico-key to manage passkeys."),
+                    .child(t!("passkeys-no-device")),
             )
             .into_any_element()
     }
@@ -694,8 +695,8 @@ impl Render for PasskeysViewModel {
         if !device_connected {
             let theme = cx.theme();
             return PageView::build(
-                "Passkeys",
-                "Manage your security PIN and the FIDO credentials (passkeys) stored on your device.",
+                t!("passkeys-title"),
+                t!("passkeys-subtitle"),
                 self.render_no_device(theme).into_any_element(),
                 theme,
             )
@@ -712,8 +713,8 @@ impl Render for PasskeysViewModel {
         if !has_fido {
             let theme = cx.theme();
             return PageView::build(
-                "Passkeys",
-                "Manage your security PIN and the FIDO credentials (passkeys) stored on your device.",
+                t!("passkeys-title"),
+                t!("passkeys-subtitle"),
                 self.render_not_supported(theme).into_any_element(),
                 theme,
             )
@@ -733,8 +734,8 @@ impl Render for PasskeysViewModel {
             .size_full()
             .relative()
             .child(PageView::build(
-                "Passkeys",
-                "Manage your security PIN and the FIDO credentials (passkeys) stored on your device.",
+                t!("passkeys-title"),
+                t!("passkeys-subtitle"),
                 content.into_any_element(),
                 theme,
             ))

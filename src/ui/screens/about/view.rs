@@ -1,5 +1,6 @@
 use crate::ui::components::{card::Card, page_view::PageView, tag::Tag};
 use crate::ui::screens::about::view_model::AboutViewModel;
+use crate::t;
 use gpui::*;
 use gpui_component::{ActiveTheme, Icon, StyledExt, button::Button, h_flex, v_flex};
 
@@ -7,7 +8,7 @@ impl Render for AboutViewModel {
     fn render(&mut self, _window: &mut Window, cx: &mut Context<Self>) -> impl IntoElement {
         let theme = cx.theme();
         PageView::build(
-            "About",
+            t!("about-title"),
             "Information about the application and its development.",
             div()
                 .w_full()
@@ -36,7 +37,7 @@ impl Render for AboutViewModel {
                                             .text_color(theme.foreground)
                                             .child("PicoForge"),
                                     )
-                                    .child(Tag::new("v0.7.1"))
+                                    .child(Tag::new(&format!("v{}", env!("CARGO_PKG_VERSION"))))
                                     .child(
                                         div()
                                             .text_color(theme.muted_foreground)

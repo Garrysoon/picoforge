@@ -1,5 +1,6 @@
 use crate::ui::components::page_view::PageView;
 use crate::ui::screens::security::view_model::SecurityViewModel;
+use crate::t;
 use gpui::*;
 use gpui_component::{
     ActiveTheme, Disableable, Icon, StyledExt,
@@ -176,7 +177,7 @@ impl Render for SecurityViewModel {
             );
 
         PageView::build(
-            "Secure Boot",
+            t!("security-secure-boot"),
             "Permanently lock this device to the current firmware vendor.",
             content,
             theme,

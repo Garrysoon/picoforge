@@ -894,11 +894,13 @@ use ui::app::ApplicationRoot;
 
 pub mod error;
 mod hal;
+pub mod i18n;
 pub mod logging;
 mod ui;
 
 fn main() {
     logging::logger_init();
+    i18n::init();
     let app = Application::new().with_assets(ui::assets::Assets);
 
     app.run(move |cx| {

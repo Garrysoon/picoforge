@@ -108,6 +108,10 @@ impl ApplicationRoot {
                     SidebarEvent::RefreshDevice => {
                         this.models.device.update(cx, |repo, cx| repo.refresh(cx));
                     }
+                    SidebarEvent::ChangeLanguage(lang) => {
+                        crate::i18n::set_language(*lang);
+                        cx.notify();
+                    }
                 }
             },
         )

@@ -38,6 +38,9 @@ gpui-component = { git = "https://github.com/librekeys/gpui-component", branch =
 # gpui-component = "0.5.1"
 rust-embed = "8.11.0"
 
+# For i18n:
+sys-locale = "0.3"
+
 [profile.dev]
 incremental = true  # Compile your binary in smaller steps.
 codegen-units = 256

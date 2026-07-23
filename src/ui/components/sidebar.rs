@@ -3,9 +3,11 @@
 use crate::ui::app::Destination;
 use crate::ui::components::button::PFIconButton;
 use crate::ui::models::device::{DeviceMethod, DeviceRepo};
+use crate::t;
+use gpui::prelude::FluentBuilder;
 use gpui::*;
 use gpui_component::{
-    ActiveTheme, Icon, IconName, Side,
+    ActiveTheme, Icon, IconName, Sizable, Side,
     button::{Button, ButtonVariants},
     h_flex,
     sidebar::*,
@@ -18,6 +20,8 @@ pub enum SidebarEvent {
     Navigate(Destination),
     /// Re-poll device hardware.
     RefreshDevice,
+    /// Change the application language.
+    ChangeLanguage(crate::i18n::Language),
 }
 
 impl EventEmitter<SidebarEvent> for AppSidebar {}
@@ -175,37 +179,38 @@ impl Render for AppSidebar {
             .bg(sidebar_bg)
             .border_color(gpui::transparent_white())
             .child(
-                SidebarGroup::new("Menu").child(
+                SidebarGroup::new(t!("sidebar-menu")).child(
                     SidebarMenu::new()
-                        .child(self.menu_item(cx, "Home", "icons/house.svg", Destination::Home))
+                        .child(self.menu_item(cx, t!("sidebar-home").leak(), "icons/house.svg", Destination::Home))
                         .child(self.menu_item(
                             cx,
-                            "Passkeys",
+                            t!("sidebar-passkeys").leak(),
                             "icons/key-round.svg",
                             Destination::Passkeys,
                         ))
                         .child(self.menu_item(
                             cx,
-                            "Configuration",
+                            t!("sidebar-config").leak(),
                             "icons/settings.svg",
                             Destination::Configuration,
                         ))
                         .child(self.menu_item(
                             cx,
-                            "Security",
+                            t!("sidebar-security").leak(),
                             "icons/shield-check.svg",
                             Destination::Security,
                         ))
                         .child(self.menu_item_icon_name(
                             cx,
-                            "About",
+                            t!("sidebar-about").leak(),
                             IconName::Info,
                             Destination::About,
                         )),
                 ),
             );
 
-        // ── Footer (device status + refresh) ─────────────────────────
+        // ── Footer (device status + refresh + language picker) ─────────────────
+        let current_lang = crate::i18n::current_language();
         let footer = v_flex()
             .w_full()
             .bg(rgb(0x111113))
@@ -253,7 +258,7 @@ impl Render for AppSidebar {
                                     .text_size(px(12.))
                                     .font_weight(gpui::FontWeight::MEDIUM)
                                     .text_color(muted_foreground)
-                                    .child("Device Status"),
+                                    .child(t!("sidebar-device-status")),
                             )
                             .child({
                                 let (text, color_bg, color_text) = if let Some(s) = &status_owned {
@@ -285,9 +290,30 @@ impl Render for AppSidebar {
                             }),
                     )
                     .child(
-                        PFIconButton::new(Icon::default().path("icons/refresh-cw.svg"), "Refresh")
+                        PFIconButton::new(Icon::default().path("icons/refresh-cw.svg"), t!("sidebar-refresh"))
                             .on_click(cx.listener(|_, _, _, cx| {
                                 cx.emit(SidebarEvent::RefreshDevice);
+                            })),
+                    )
+                    .child(
+                        h_flex()
+                            .gap_1()
+                            .flex_wrap()
+                            .children(crate::i18n::Language::all().iter().map(|&lang| {
+                                let is_active = lang == current_lang;
+                                let label = lang.code().to_uppercase();
+                                Button::new(SharedString::from(format!("lang-{}", lang.code())))
+                                    .label(label)
+                                    .small()
+                                    .when(!is_active, |btn| {
+                                        btn.ghost()
+                                            .on_click(cx.listener(move |_, _, _, cx| {
+                                                cx.emit(SidebarEvent::ChangeLanguage(lang));
+                                            }))
+                                    })
+                                    .when(is_active, |btn| {
+                                        btn.primary()
+                                    })
                             })),
                     )
             });

@@ -1,6 +1,7 @@
 use crate::ui::components::{card::Card, page_view::PageView, tag::Tag};
 use crate::ui::models::device::{DeviceMethod, FidoDeviceInfo, FirmwareType, FullDeviceStatus};
 use crate::ui::screens::home::view_model::HomeViewModel;
+use crate::t;
 use gpui::prelude::FluentBuilder;
 use gpui::*;
 use gpui_component::{ActiveTheme, StyledExt};
@@ -40,7 +41,7 @@ impl HomeViewModel {
         let config = &status.config;
 
         Card::new()
-            .title("Device Information")
+            .title(t!("home-device-name"))
             .icon(Icon::default().path("icons/cpu.svg"))
             .child(
                 v_flex()
@@ -51,13 +52,13 @@ impl HomeViewModel {
                             .grid_cols(2)
                             .gap_4()
                             .child(Self::render_kv(
-                                "Serial Number",
+                                t!("home-serial-number").leak(),
                                 info.serial.clone(),
                                 theme,
                                 true,
                             ))
                             .child(Self::render_kv(
-                                "Firmware Version",
+                                t!("home-firmware-version").leak(),
                                 format!("v{}", info.firmware_version),
                                 theme,
                                 true,
@@ -69,7 +70,7 @@ impl HomeViewModel {
                                 false,
                             ))
                             .child(Self::render_kv(
-                                "VID:PID",
+                                t!("home-usb-vid-pid").leak(),
                                 format!("{}:{}", config.vid, config.pid),
                                 theme,
                                 true,
@@ -92,7 +93,7 @@ impl HomeViewModel {
                                     .child(
                                         div()
                                             .text_color(theme.muted_foreground)
-                                            .child("Flash Memory"),
+                                            .child(t!("home-flash-usage")),
                                     )
                                     .child(div().text_color(theme.foreground).child(
                                         if let (Some(used), Some(total)) =
@@ -290,7 +291,7 @@ impl HomeViewModel {
                             .child(
                                 div()
                                     .text_color(theme.muted_foreground)
-                                    .child("LED GPIO Pin"),
+                                    .child(t!("config-led-gpio")),
                             )
                             .child(
                                 config
@@ -305,7 +306,7 @@ impl HomeViewModel {
                             .child(
                                 div()
                                     .text_color(theme.muted_foreground)
-                                    .child("LED Brightness"),
+                                    .child(t!("config-led-brightness")),
                             )
                             .child(
                                 config
@@ -320,7 +321,7 @@ impl HomeViewModel {
                             .child(
                                 div()
                                     .text_color(theme.muted_foreground)
-                                    .child("Presence Touch Timeout"),
+                                    .child(t!("config-touch-timeout")),
                             )
                             .child(
                                 config
@@ -361,7 +362,7 @@ impl HomeViewModel {
 
     fn render_security_status(status: &FullDeviceStatus, theme: &Theme) -> impl IntoElement {
         Card::new()
-            .title("Security Status")
+            .title(t!("security-title"))
             .icon(Icon::default().path("icons/shield-check.svg"))
             .child(
                 v_flex()
@@ -371,7 +372,7 @@ impl HomeViewModel {
                         h_flex()
                             .justify_between()
                             .items_center()
-                            .child(div().text_color(theme.muted_foreground).child("Boot Mode"))
+                            .child(div().text_color(theme.muted_foreground).child(t!("security-secure-boot")))
                             .child(
                                 h_flex()
                                     .gap_2()
@@ -389,9 +390,9 @@ impl HomeViewModel {
                                     })
                                     .child(
                                         Tag::new(if status.secure_boot {
-                                            "Secure Boot"
+                                            t!("security-enabled")
                                         } else {
-                                            "Development"
+                                            t!("security-disabled")
                                         })
                                         .active(status.secure_boot),
                                     ),
@@ -444,8 +445,8 @@ impl Render for HomeViewModel {
         let columns = if is_wide { 2 } else { 1 };
 
         PageView::build(
-            "Device Overview",
-            "Quick view of your device status and specifications.",
+            t!("home-title"),
+            t!("home-subtitle"),
             if !connected {
                 div()
                     .flex()
@@ -458,7 +459,7 @@ impl Render for HomeViewModel {
                     .child(
                         div()
                             .text_color(cx.theme().muted_foreground)
-                            .child("No Device Connected"),
+                            .child(t!("common-no-device")),
                     )
                     .into_any_element()
             } else {
