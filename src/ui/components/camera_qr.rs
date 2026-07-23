@@ -1,3 +1,4 @@
+use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::{Arc, Mutex};
 use std::thread;
 
@@ -7,6 +8,7 @@ use gpui_component::{
     input::{Input, InputState},
     v_flex,
 };
+use image::{Frame, RgbaImage};
 
 use crate::t;
 
@@ -14,6 +16,8 @@ pub struct CameraQrScanner {
     url_input: Entity<InputState>,
     camera_status: Arc<Mutex<Option<String>>>,
     found_uri: Arc<Mutex<Option<String>>>,
+    latest_frame: Arc<Mutex<Option<Arc<RenderImage>>>>,
+    stop_signal: Arc<AtomicBool>,
 }
 
 impl CameraQrScanner {
@@ -24,17 +28,23 @@ impl CameraQrScanner {
 
         let camera_status = Arc::new(Mutex::new(None::<String>));
         let found_uri = Arc::new(Mutex::new(None::<String>));
+        let latest_frame: Arc<Mutex<Option<Arc<RenderImage>>>> = Arc::new(Mutex::new(None));
+        let stop_signal = Arc::new(AtomicBool::new(false));
 
         let cs = camera_status.clone();
         let fu = found_uri.clone();
+        let lf = latest_frame.clone();
+        let ss = stop_signal.clone();
         thread::spawn(move || {
-            start_camera_thread(cs, fu);
+            start_camera_thread(cs, fu, lf, ss);
         });
 
         Self {
             url_input,
             camera_status,
             found_uri,
+            latest_frame,
+            stop_signal,
         }
     }
 
@@ -48,9 +58,17 @@ impl CameraQrScanner {
     }
 }
 
+impl Drop for CameraQrScanner {
+    fn drop(&mut self) {
+        self.stop_signal.store(true, Ordering::Relaxed);
+    }
+}
+
 fn start_camera_thread(
     status: Arc<Mutex<Option<String>>>,
     found_uri: Arc<Mutex<Option<String>>>,
+    latest_frame: Arc<Mutex<Option<Arc<RenderImage>>>>,
+    stop: Arc<AtomicBool>,
 ) {
     use nokhwa::pixel_format::RgbFormat;
     use nokhwa::utils::{ApiBackend, RequestedFormat, RequestedFormatType};
@@ -92,11 +110,15 @@ fn start_camera_thread(
     let mut found = false;
 
     for _ in 0..120 {
-        if found_uri.lock().unwrap().is_some() {
+        if stop.load(Ordering::Relaxed) || found_uri.lock().unwrap().is_some() {
             break;
         }
 
         thread::sleep(std::time::Duration::from_millis(250));
+
+        if stop.load(Ordering::Relaxed) {
+            break;
+        }
 
         let frame = match camera.frame() {
             Ok(f) => f,
@@ -109,11 +131,22 @@ fn start_camera_thread(
         };
 
         let (w, h) = rgb_image.dimensions();
-        let w = w as usize;
-        let h = h as usize;
+
+        let mut rgba = Vec::with_capacity((w * h * 4) as usize);
+        for pixel in rgb_image.pixels() {
+            rgba.push(pixel[0]);
+            rgba.push(pixel[1]);
+            rgba.push(pixel[2]);
+            rgba.push(255);
+        }
+
+        if let Some(rgba_img) = RgbaImage::from_raw(w, h, rgba) {
+            let frame_img = Frame::from_parts(rgba_img, 0, 0, image::Delay::from_numer_denom_ms(1, 15));
+            *latest_frame.lock().unwrap() = Some(Arc::new(RenderImage::new(vec![frame_img])));
+        }
 
         let mut prepared =
-            rqrr::PreparedImage::prepare_from_greyscale(w, h, |x, y| {
+            rqrr::PreparedImage::prepare_from_greyscale(w as usize, h as usize, |x, y| {
                 let pixel = rgb_image.get_pixel(x as u32, y as u32);
                 let r = pixel[0] as f32;
                 let g = pixel[1] as f32;
@@ -137,7 +170,7 @@ fn start_camera_thread(
         }
     }
 
-    if !found && found_uri.lock().unwrap().is_none() {
+    if !found && found_uri.lock().unwrap().is_none() && !stop.load(Ordering::Relaxed) {
         *status.lock().unwrap() = Some("No QR code detected".into());
     }
     let _ = camera.stop_stream();
@@ -145,7 +178,6 @@ fn start_camera_thread(
 
 impl Render for CameraQrScanner {
     fn render(&mut self, window: &mut Window, cx: &mut Context<Self>) -> impl IntoElement {
-        // Check for found URI before borrowing cx for theme
         if let Some(uri) = self.found_uri.lock().unwrap().take() {
             self.url_input.update(cx, |inp, cx| {
                 inp.set_value(uri.clone(), window, cx);
@@ -163,40 +195,74 @@ impl Render for CameraQrScanner {
             .unwrap_or_default();
         let scanning = status == "Scanning...";
 
+        let preview = self.latest_frame.lock().unwrap().clone();
+
+        let camera_area = if let Some(render_img) = preview {
+            div()
+                .flex()
+                .items_center()
+                .justify_center()
+                .h(px(240.0))
+                .rounded_lg()
+                .overflow_hidden()
+                .child(
+                    img(ImageSource::Render(render_img))
+                        .object_fit(gpui::ObjectFit::Cover)
+                        .w_full()
+                        .h_full(),
+                )
+        } else {
+            div()
+                .flex()
+                .items_center()
+                .justify_center()
+                .h(px(240.0))
+                .rounded_lg()
+                .border_1()
+                .border_color(theme.border.clone())
+                .bg(theme.muted.clone())
+                .child(
+                    v_flex()
+                        .gap_2()
+                        .items_center()
+                        .justify_center()
+                        .w_full()
+                        .child(
+                            div()
+                                .text_sm()
+                                .text_color(theme.muted_foreground.clone())
+                                .child(t!("oath-import-qr-camera-hint")),
+                        )
+                        .child(
+                            div()
+                                .text_xs()
+                                .text_color(if scanning {
+                                    theme.primary.clone()
+                                } else {
+                                    theme.muted_foreground.clone()
+                                })
+                                .child(status.clone()),
+                        ),
+                )
+        };
+
         v_flex()
             .gap_4()
+            .child(camera_area)
             .child(
                 div()
                     .flex()
                     .items_center()
-                    .justify_center()
-                    .h(px(200.0))
-                    .rounded_lg()
-                    .border_1()
-                    .border_color(theme.border.clone())
-                    .bg(theme.muted.clone())
+                    .justify_between()
                     .child(
-                        v_flex()
-                            .gap_2()
-                            .items_center()
-                            .justify_center()
-                            .w_full()
-                            .child(
-                                div()
-                                    .text_sm()
-                                    .text_color(theme.muted_foreground.clone())
-                                    .child(t!("oath-import-qr-camera-hint")),
-                            )
-                            .child(
-                                div()
-                                    .text_xs()
-                                    .text_color(if scanning {
-                                        theme.primary.clone()
-                                    } else {
-                                        theme.muted_foreground.clone()
-                                    })
-                                    .child(status),
-                            ),
+                        div()
+                            .text_xs()
+                            .text_color(if scanning {
+                                theme.primary.clone()
+                            } else {
+                                theme.muted_foreground.clone()
+                            })
+                            .child(status),
                     ),
             )
             .child(div().h_px().bg(theme.border.clone()))
