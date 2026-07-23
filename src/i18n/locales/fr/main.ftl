@@ -151,6 +151,7 @@ oath-credentials-stored = {count} identifiants
 oath-import-qr = Importer un QR Code
 oath-import-qr-paste = Ou collez l'URI otpauth:// manuellement :
 oath-import-qr-camera = Scanner QR Code par caméra
+oath-import-qr-camera-hint = Diriger la caméra vers le QR code
 oath-import-qr-starting = Démarrage de la caméra...
 oath-import-qr-scanning = Pointez la caméra vers le QR Code...
 oath-import-qr-found = QR Code détecté !
