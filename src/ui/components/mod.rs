@@ -1,6 +1,7 @@
 //! Reusable UI components built on top of gpui-component primitives.
 
 pub mod button;
+pub mod camera_qr;
 pub mod card;
 pub mod dialog;
 pub mod page_view;

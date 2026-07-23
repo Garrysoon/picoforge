@@ -63,6 +63,25 @@ config-min-pin-length = Longueur minimale du PIN
 config-touch-timeout = Délai de toucher
 config-led-brightness = Luminosité LED
 config-led-gpio = LED GPIO
+config-vendor-preset = Préréglage fabricant
+config-vendor-id = ID fabricant (HEX)
+config-product-id = ID produit (HEX)
+config-product-name = Nom du produit
+config-led-gpio-pin = Broche LED GPIO
+config-led-driver = Pilote LED
+config-brightness = Luminosité (0-15)
+config-led-dimmable = LED dimmable
+config-led-dimmable-desc = Autoriser l'ajustement de la luminosité
+config-led-steady = Mode LED constant
+config-led-steady-desc = Garder la LED allumée en permanence
+config-touch-timeout-label = Délai de toucher (secondes)
+config-power-cycle = Redémarrage à la réinitialisation
+config-power-cycle-desc = Redémarrer l'appareil à la réinitialisation
+config-global-steady = Mode constant global
+config-global-steady-desc = Garder les LEDs de statut allumées en permanence
+config-save-led = Enregistrer la config LED
+config-save-apps = Enregistrer les applications USB
+config-apply-changes = Appliquer les modifications
 
 # Écran de sécurité
 security-title = Sécurité et Attestation
@@ -130,7 +149,15 @@ oath-hotp = HOTP
 oath-digits = { $count } chiffres
 oath-credentials-stored = {count} identifiants
 oath-import-qr = Importer un QR Code
-oath-import-qr-paste = Collez l'URI otpauth:// du QR Code Google Authenticator
+oath-import-qr-paste = Ou collez l'URI otpauth:// manuellement :
+oath-import-qr-camera = Scanner QR Code par caméra
+oath-import-qr-starting = Démarrage de la caméra...
+oath-import-qr-scanning = Pointez la caméra vers le QR Code...
+oath-import-qr-found = QR Code détecté !
+oath-import-qr-error = Erreur de caméra
+oath-import-qr-no-camera = Aucune caméra disponible
+oath-import-qr-start-camera = Démarrer la caméra
+oath-import-qr-start-camera-hint = Cliquez sur "Démarrer la caméra" pour scanner ou collez l'URI otpauth:// ci-dessous
 
 # Écran OTP
 otp-title = Authentificateur OTP

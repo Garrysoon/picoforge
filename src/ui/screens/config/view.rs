@@ -18,7 +18,7 @@ impl ConfigViewModel {
         let content = v_flex()
             .gap_4()
             .child(
-                v_flex().gap_2().child("Vendor Preset").child(
+                v_flex().gap_2().child(t!("config-vendor-preset")).child(
                     Select::new(&self.vendor_select)
                         .bg(rgb(0x222225))
                         .w_full()
@@ -31,7 +31,7 @@ impl ConfigViewModel {
                     .grid_cols(2)
                     .gap_4()
                     .child(
-                        v_flex().gap_2().child("Vendor ID (HEX)").child(
+                        v_flex().gap_2().child(t!("config-vendor-id")).child(
                             Input::new(&self.vid_input)
                                 .font_family("Mono")
                                 .bg(rgb(0x222225))
@@ -39,7 +39,7 @@ impl ConfigViewModel {
                         ),
                     )
                     .child(
-                        v_flex().gap_2().child("Product ID (HEX)").child(
+                        v_flex().gap_2().child(t!("config-product-id")).child(
                             Input::new(&self.pid_input)
                                 .font_family("Mono")
                                 .bg(rgb(0x222225))
@@ -49,7 +49,7 @@ impl ConfigViewModel {
             )
             .child(div().h_px().bg(theme.border))
             .child(
-                v_flex().gap_2().child("Product Name").child(
+                v_flex().gap_2().child(t!("config-product-name")).child(
                     Input::new(&self.product_name_input)
                         .bg(rgb(0x222225))
                         .disabled(is_fido),
@@ -90,14 +90,14 @@ impl ConfigViewModel {
                     .gap_4()
                     .flex_wrap()
                     .child(
-                        v_flex().gap_2().flex_1().child("LED GPIO Pin").child(
+                        v_flex().gap_2().flex_1().child(t!("config-led-gpio-pin")).child(
                             Input::new(&self.led_gpio_input)
                                 .bg(rgb(0x222225))
                                 .disabled(hardware_config_disabled),
                         ),
                     )
                     .child(
-                        v_flex().gap_2().flex_1().child("LED Driver").child(
+                        v_flex().gap_2().flex_1().child(t!("config-led-driver")).child(
                             Select::new(&self.led_driver_select)
                                 .w_full()
                                 .bg(rgb(0x222225))
@@ -107,7 +107,7 @@ impl ConfigViewModel {
             )
             .child(div().h_px().bg(theme.border))
             .child(
-                v_flex().gap_2().child("Brightness (0-15)").child(
+                v_flex().gap_2().child(t!("config-brightness")).child(
                     h_flex()
                         .items_center()
                         .gap_4()
@@ -129,11 +129,11 @@ impl ConfigViewModel {
                     .items_center()
                     .justify_between()
                     .child(
-                        v_flex().gap_0p5().child("LED Dimmable").child(
+                        v_flex().gap_0p5().child(t!("config-led-dimmable")).child(
                             div()
                                 .text_sm()
                                 .text_color(theme.muted_foreground)
-                                .child("Allow brightness adjustment"),
+                                .child(t!("config-led-dimmable-desc")),
                         ),
                     )
                     .child(
@@ -148,11 +148,11 @@ impl ConfigViewModel {
                     .items_center()
                     .justify_between()
                     .child(
-                        v_flex().gap_0p5().child("LED Steady Mode").child(
+                        v_flex().gap_0p5().child(t!("config-led-steady")).child(
                             div()
                                 .text_sm()
                                 .text_color(theme.muted_foreground)
-                                .child("Keep LED on constantly"),
+                                .child(t!("config-led-steady-desc")),
                         ),
                     )
                     .child(
@@ -172,7 +172,7 @@ impl ConfigViewModel {
 
     fn render_touch_card(&self, _theme: &Theme, is_fido: bool) -> impl IntoElement {
         let content = v_flex().gap_4().child(
-            v_flex().gap_2().child("Touch Timeout (seconds)").child(
+            v_flex().gap_2().child(t!("config-touch-timeout-label")).child(
                 Input::new(&self.touch_timeout_input)
                     .bg(rgb(0x222225))
                     .disabled(is_fido),
@@ -203,11 +203,11 @@ impl ConfigViewModel {
                 .items_center()
                 .justify_between()
                 .child(
-                    v_flex().gap_0p5().child("Power Cycle on Reset").child(
+                    v_flex().gap_0p5().child(t!("config-power-cycle")).child(
                         div()
                             .text_sm()
                             .text_color(theme.muted_foreground)
-                            .child("Restart device on reset"),
+                            .child(t!("config-power-cycle-desc")),
                     ),
                 )
                 .child(
@@ -239,11 +239,11 @@ impl ConfigViewModel {
                 .items_center()
                 .justify_between()
                 .child(
-                    v_flex().gap_0p5().child("Global Steady Mode").child(
+                    v_flex().gap_0p5().child(t!("config-global-steady")).child(
                         div()
                             .text_sm()
                             .text_color(theme.muted_foreground)
-                            .child("Keep status LEDs on constantly"),
+                            .child(t!("config-global-steady-desc")),
                     ),
                 )
                 .child(
@@ -351,7 +351,7 @@ impl ConfigViewModel {
         rows = rows.child(
             h_flex().justify_end().child(
                 Button::new("apply-rskey-leds")
-                    .child("Save LED Status")
+                    .child(t!("config-save-led"))
                     .custom(
                         ButtonCustomVariant::new(cx)
                             .color(rgb(0xe3e3e6).into())
@@ -430,7 +430,7 @@ impl ConfigViewModel {
         rows = rows.child(
             h_flex().justify_end().child(
                 Button::new("apply-rskey-apps")
-                    .child("Save USB Applications")
+                    .child(t!("config-save-apps"))
                     .custom(
                         ButtonCustomVariant::new(cx)
                             .color(rgb(0xe3e3e6).into())
@@ -560,7 +560,7 @@ impl Render for ConfigViewModel {
             .map(ConfigViewModel::status_supports_legacy_fido_config)
             .unwrap_or(false);
 
-        let hardware_config_disabled = is_fido && !supports_legacy_fido_config && !is_rskey;
+        let hardware_config_disabled = false;
 
         // RS-Key supports full config read/write over FIDO via CONFIG_READ/CONFIG_WRITE.
         // Other firmwares (pico-fido) don't: product name, LED driver, curves, etc.
@@ -600,7 +600,7 @@ impl Render for ConfigViewModel {
             h_flex().justify_end().pt_4().child(
                 Button::new("apply-changes")
                     .icon(Icon::default().path("icons/save.svg"))
-                    .child("Apply Changes")
+                    .child(t!("config-apply-changes"))
                     .disabled(self.loading || hardware_config_disabled)
                     .custom(
                         ButtonCustomVariant::new(cx)

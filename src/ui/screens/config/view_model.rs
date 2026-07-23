@@ -807,11 +807,12 @@ impl ConfigViewModel {
             if Self::status_supports_legacy_fido_config(status) || is_rskey {
                 self.open_pin_dialog(changes, window, cx);
             } else {
+                // FIDO without legacy config support — auto-route to Rescue
                 let handle =
-                    dialog::open_status_dialog("Configuration Requires Rescue Mode", window, cx);
+                    dialog::open_status_dialog("Applying via Rescue Mode", window, cx);
                 self.write_config_to_device(
                     changes,
-                    method,
+                    DeviceMethod::Rescue,
                     None,
                     StatusDialogHandle::Status(handle),
                     cx,

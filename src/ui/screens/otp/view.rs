@@ -1,4 +1,5 @@
 use crate::ui::components::page_view::PageView;
+use crate::ui::components::camera_qr::CameraQrScanner;
 use crate::ui::screens::otp::view_model::{OtpCredential, OtpType, OtpViewModel};
 use crate::t;
 use gpui::prelude::FluentBuilder;
@@ -262,40 +263,26 @@ impl OtpViewModel {
     }
 
     fn open_qr_import_dialog(&mut self, window: &mut Window, cx: &mut Context<Self>) {
-        let url_input = cx.new(|cx| {
-            InputState::new(window, cx)
-                .placeholder("otpauth://totp/...")
-        });
         let entity = cx.entity().clone();
-        let url_for_dialog = url_input.clone();
 
-        window.open_dialog(cx, move |dialog, _, _| {
-            let url_clone = url_for_dialog.clone();
-            let entity_clone = entity.clone();
+        window.open_dialog(cx, move |dialog, window, cx| {
+            let scanner = cx.new(|cx| CameraQrScanner::new(window, cx));
+            let scanner_for_ok = scanner.clone();
+            let entity_for_ok = entity.clone();
 
             dialog
                 .title(t!("oath-import-qr"))
-                .child(
-                    v_flex()
-                        .gap_4()
-                        .child(
-                            v_flex()
-                                .gap_2()
-                                .child(t!("oath-import-qr-paste"))
-                                .child(Input::new(&url_clone)),
-                        ),
-                )
+                .child(scanner)
                 .on_ok(move |_, _, cx| {
-                    let url = url_clone.read(cx).value().to_string();
-                    if url.is_empty() {
-                        return true;
+                    let uri = scanner_for_ok.read(cx).get_uri(cx);
+                    if let Some(uri) = uri {
+                        let _ = entity_for_ok.update(cx, |this: &mut OtpViewModel, cx| {
+                            if let Some(cred) = OtpViewModel::parse_otpauth_uri(&uri) {
+                                this.add_credential(cred);
+                            }
+                            cx.notify();
+                        });
                     }
-                    let _ = entity_clone.update(cx, |this: &mut OtpViewModel, cx| {
-                        if let Some(cred) = OtpViewModel::parse_otpauth_uri(&url) {
-                            this.add_credential(cred);
-                        }
-                        cx.notify();
-                    });
                     true
                 })
         });

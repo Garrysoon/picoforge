@@ -36,6 +36,7 @@ impl SecurityViewModel {
 
     pub fn refresh_status(&mut self, cx: &mut Context<Self>) {
         self.loading = true;
+        self.status_message = Some("Connecting to device...".into());
         cx.notify();
 
         let weak_self = cx.entity().downgrade();
@@ -49,14 +50,28 @@ impl SecurityViewModel {
             let _ = weak_self.update(cx, |this: &mut SecurityViewModel, cx| {
                 match result {
                     Ok(status) => {
+                        let method = status.method.clone();
                         this.secure_boot_enabled = status.secure_boot;
                         this.secure_lock_enabled = status.secure_lock;
                         this.loading = false;
-                        this.status_message = None;
+                        if method == crate::hal::types::DeviceMethod::Fido && !status.secure_boot && !status.secure_lock {
+                            // FIDO path hardcodes secure_boot=false — may be inaccurate
+                            this.status_message = Some(
+                                "Device connected via FIDO. Secure Boot status may be inaccurate.\n\
+                                 To read/change Secure Boot, put device in Rescue mode (hold button while plugging in)."
+                                    .into(),
+                            );
+                        } else {
+                            this.status_message = None;
+                        }
                     }
                     Err(e) => {
                         this.loading = false;
-                        this.status_message = Some(format!("Error: {}", e));
+                        this.status_message = Some(format!(
+                            "Error: {}\n\nTo configure Secure Boot, put device in Rescue mode \
+                             (hold button while plugging in) and ensure a PC/SC reader is available.",
+                            e
+                        ));
                     }
                 }
                 cx.notify();
@@ -93,7 +108,11 @@ impl SecurityViewModel {
                     }
                     Err(e) => {
                         this.loading = false;
-                        this.status_message = Some(format!("Error: {}", e));
+                        this.status_message = Some(format!(
+                            "Error: {}\n\nMake sure the device is in Rescue mode (hold button while plugging in) \
+                             and a PC/SC reader is available.",
+                            e
+                        ));
                     }
                 }
                 cx.notify();
