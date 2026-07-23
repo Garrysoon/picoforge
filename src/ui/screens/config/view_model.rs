@@ -806,8 +806,11 @@ impl ConfigViewModel {
         if method == DeviceMethod::Fido {
             if Self::status_supports_legacy_fido_config(status) || is_rskey {
                 self.open_pin_dialog(changes, window, cx);
+            } else if Self::status_supports_fido_config_write(status) {
+                // pico-fido v7+ supports FIDO config write — ask for PIN
+                self.open_pin_dialog(changes, window, cx);
             } else {
-                // FIDO without legacy config support — auto-route to Rescue
+                // No FIDO config support — try Rescue
                 let handle =
                     dialog::open_status_dialog("Applying via Rescue Mode", window, cx);
                 self.write_config_to_device(
@@ -872,6 +875,15 @@ impl ConfigViewModel {
                 &status.firmware_type,
                 &status.info.firmware_version,
             )
+    }
+
+    pub(super) fn status_supports_fido_config_write(status: &FullDeviceStatus) -> bool {
+        status.method == DeviceMethod::Fido
+            && crate::hal::firmwares::AnyFirmware::new(
+                status.firmware_type.clone(),
+                &status.info.firmware_version,
+            )
+            .supports_fido_config_write()
     }
 
     #[allow(dead_code)]

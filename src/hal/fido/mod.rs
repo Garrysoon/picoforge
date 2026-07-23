@@ -1210,6 +1210,7 @@ fn validate_fido_config_changes(
     firmware: &AnyFirmware,
 ) -> Result<(), PFError> {
     let allow_write = firmware.supports_legacy_fido_hardware_config()
+        || firmware.supports_fido_config_write()
         || firmware.supports_rs_key_vendor_command();
     if !allow_write {
         if config.vid.is_some()
