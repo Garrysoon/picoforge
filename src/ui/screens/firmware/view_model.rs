@@ -49,7 +49,7 @@ impl FirmwareViewModel {
             let result = cx
                 .background_executor()
                 .spawn(async move {
-                    check_github_releases().await
+                    check_github_releases_blocking()
                 })
                 .await;
 
@@ -111,6 +111,50 @@ async fn check_github_releases() -> Result<(String, String), String> {
     let json: serde_json::Value = resp
         .json()
         .await
+        .map_err(|e| format!("JSON parse error: {}", e))?;
+
+    let version = json["tag_name"]
+        .as_str()
+        .unwrap_or("unknown")
+        .to_string();
+
+    let mut download_url = String::new();
+    if let Some(assets) = json["assets"].as_array() {
+        for asset in assets {
+            if let Some(name) = asset["name"].as_str() {
+                if name.ends_with(".bin") {
+                    download_url = asset["browser_download_url"]
+                        .as_str()
+                        .unwrap_or("")
+                        .to_string();
+                    break;
+                }
+            }
+        }
+    }
+
+    if download_url.is_empty() {
+        return Err("No .bin asset found in release".into());
+    }
+
+    Ok((version, download_url))
+}
+
+fn check_github_releases_blocking() -> Result<(String, String), String> {
+    let url = "https://api.github.com/repos/Garrysoon/pico-fido/releases/latest";
+    let client = reqwest::blocking::Client::builder()
+        .timeout(std::time::Duration::from_secs(15))
+        .build()
+        .map_err(|e| format!("Client error: {}", e))?;
+
+    let resp = client
+        .get(url)
+        .header("User-Agent", "picoforge")
+        .send()
+        .map_err(|e| format!("HTTP error: {}", e))?;
+
+    let json: serde_json::Value = resp
+        .json()
         .map_err(|e| format!("JSON parse error: {}", e))?;
 
     let version = json["tag_name"]
