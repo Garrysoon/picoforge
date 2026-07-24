@@ -220,17 +220,13 @@ impl Render for CameraQrScanner {
 
         let camera_area = if let Some(render_img) = preview {
             div()
-                .flex()
-                .items_center()
-                .justify_center()
                 .h(px(240.0))
                 .rounded_lg()
                 .overflow_hidden()
                 .child(
                     img(ImageSource::Render(render_img))
-                        .object_fit(gpui::ObjectFit::Cover)
-                        .w_full()
-                        .h_full(),
+                        .w(px(320.0))
+                        .h(px(240.0)),
                 )
         } else {
             div()
