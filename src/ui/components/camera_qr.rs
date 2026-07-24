@@ -39,6 +39,27 @@ impl CameraQrScanner {
             start_camera_thread(cs, fu, lf, ss);
         });
 
+        let weak = cx.entity().downgrade();
+        let stop_clone = stop_signal.clone();
+        cx.spawn_in(window, async move |_this, cx| {
+            loop {
+                cx.background_executor()
+                    .timer(std::time::Duration::from_millis(100))
+                    .await;
+                if stop_clone.load(Ordering::Relaxed) {
+                    break;
+                }
+                if let Some(e) = weak.upgrade() {
+                    let _ = e.update(cx, |_s, cx| {
+                        cx.notify();
+                    });
+                } else {
+                    break;
+                }
+            }
+        })
+        .detach();
+
         Self {
             url_input,
             camera_status,
