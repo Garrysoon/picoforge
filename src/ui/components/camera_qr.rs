@@ -8,7 +8,6 @@ use gpui_component::{
     input::{Input, InputState},
     v_flex,
 };
-use image::{Frame, RgbaImage};
 
 use crate::t;
 
@@ -16,7 +15,7 @@ pub struct CameraQrScanner {
     url_input: Entity<InputState>,
     camera_status: Arc<Mutex<Option<String>>>,
     found_uri: Arc<Mutex<Option<String>>>,
-    latest_frame: Arc<Mutex<Option<Arc<RenderImage>>>>,
+    frame_path: Arc<Mutex<Option<String>>>,
     stop_signal: Arc<AtomicBool>,
 }
 
@@ -28,25 +27,26 @@ impl CameraQrScanner {
 
         let camera_status = Arc::new(Mutex::new(None::<String>));
         let found_uri = Arc::new(Mutex::new(None::<String>));
-        let latest_frame: Arc<Mutex<Option<Arc<RenderImage>>>> = Arc::new(Mutex::new(None));
+        let frame_path: Arc<Mutex<Option<String>>> = Arc::new(Mutex::new(None));
         let stop_signal = Arc::new(AtomicBool::new(false));
 
         let cs = camera_status.clone();
         let fu = found_uri.clone();
-        let lf = latest_frame.clone();
+        let fp = frame_path.clone();
         let ss = stop_signal.clone();
         thread::spawn(move || {
-            start_camera_thread(cs, fu, lf, ss);
+            start_camera_thread(cs, fu, fp, ss);
         });
 
         let weak = cx.entity().downgrade();
-        let stop_clone = stop_signal.clone();
+        let fp2 = frame_path.clone();
+        let ss2 = stop_signal.clone();
         cx.spawn_in(window, async move |_this, cx| {
             loop {
                 cx.background_executor()
                     .timer(std::time::Duration::from_millis(100))
                     .await;
-                if stop_clone.load(Ordering::Relaxed) {
+                if ss2.load(Ordering::Relaxed) {
                     break;
                 }
                 if let Some(e) = weak.upgrade() {
@@ -64,7 +64,7 @@ impl CameraQrScanner {
             url_input,
             camera_status,
             found_uri,
-            latest_frame,
+            frame_path,
             stop_signal,
         }
     }
@@ -88,7 +88,7 @@ impl Drop for CameraQrScanner {
 fn start_camera_thread(
     status: Arc<Mutex<Option<String>>>,
     found_uri: Arc<Mutex<Option<String>>>,
-    latest_frame: Arc<Mutex<Option<Arc<RenderImage>>>>,
+    frame_path: Arc<Mutex<Option<String>>>,
     stop: Arc<AtomicBool>,
 ) {
     use nokhwa::pixel_format::RgbFormat;
@@ -128,6 +128,10 @@ fn start_camera_thread(
         return;
     }
 
+    let tmp_dir = std::env::temp_dir().join("picoforge_camera");
+    let _ = std::fs::create_dir_all(&tmp_dir);
+
+    let mut frame_count: u32 = 0;
     let mut found = false;
 
     for _ in 0..120 {
@@ -151,29 +155,27 @@ fn start_camera_thread(
             Err(_) => continue,
         };
 
-        let (w, h) = rgb_image.dimensions();
+        frame_count = frame_count.wrapping_add(1);
+        let path = tmp_dir.join(format!("frame_{}.png", frame_count));
 
-        let mut rgba = Vec::with_capacity((w * h * 4) as usize);
-        for pixel in rgb_image.pixels() {
-            rgba.push(pixel[0]);
-            rgba.push(pixel[1]);
-            rgba.push(pixel[2]);
-            rgba.push(255);
+        if let Err(_) = rgb_image.save(&path) {
+            continue;
         }
 
-        if let Some(rgba_img) = RgbaImage::from_raw(w, h, rgba) {
-            let frame_img = Frame::from_parts(rgba_img, 0, 0, image::Delay::from_numer_denom_ms(1, 15));
-            *latest_frame.lock().unwrap() = Some(Arc::new(RenderImage::new(vec![frame_img])));
-        }
+        *frame_path.lock().unwrap() = Some(path.to_string_lossy().to_string());
 
         let mut prepared =
-            rqrr::PreparedImage::prepare_from_greyscale(w as usize, h as usize, |x, y| {
-                let pixel = rgb_image.get_pixel(x as u32, y as u32);
-                let r = pixel[0] as f32;
-                let g = pixel[1] as f32;
-                let b = pixel[2] as f32;
-                (0.299 * r + 0.587 * g + 0.114 * b) as u8
-            });
+            rqrr::PreparedImage::prepare_from_greyscale(
+                rgb_image.dimensions().0 as usize,
+                rgb_image.dimensions().1 as usize,
+                |x, y| {
+                    let pixel = rgb_image.get_pixel(x as u32, y as u32);
+                    let r = pixel[0] as f32;
+                    let g = pixel[1] as f32;
+                    let b = pixel[2] as f32;
+                    (0.299 * r + 0.587 * g + 0.114 * b) as u8
+                },
+            );
 
         for grid in prepared.detect_grids() {
             if let Ok((_meta, content)) = grid.decode() {
@@ -216,18 +218,14 @@ impl Render for CameraQrScanner {
             .unwrap_or_default();
         let scanning = status == "Scanning...";
 
-        let preview = self.latest_frame.lock().unwrap().clone();
+        let current_frame = self.frame_path.lock().unwrap().clone();
 
-        let camera_area = if let Some(render_img) = preview {
+        let camera_area = if let Some(path) = current_frame {
             div()
                 .h(px(240.0))
                 .rounded_lg()
                 .overflow_hidden()
-                .child(
-                    img(ImageSource::Render(render_img))
-                        .w(px(320.0))
-                        .h(px(240.0)),
-                )
+                .child(img(path).w(px(320.0)).h(px(240.0)))
         } else {
             div()
                 .flex()
